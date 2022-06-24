@@ -1,7 +1,7 @@
 class VegetableStore{
     constructor(owner,location){
         this.owner = owner
-        this.location - location
+        this.location = location
         this.availableProducts = []
         
     }
@@ -45,11 +45,11 @@ class VegetableStore{
             if(found){
 
             }else{
-                throw new Error(`${productName} is not available in the store, your current bill is ${cost}.` )
+                throw new Error(`${productName} is not available in the store, your current bill is ${"$"+cost.toFixed(2)}.` )
             }
 
             if(productQuantity > found.productQuantity){
-                return `The quantity ${productQuantity} for the vegetable ${productName} is not available in the store, your current bill is ${cost}.` 
+                throw new Error(`The quantity ${productQuantity} for the vegetable ${productName} is not available in the store, your current bill is ${"$"+cost.toFixed(2)}.`)  
             }
             cost += productQuantity * found.productPrice
             this.availableProducts.productQuantity = found.productQuantity -= productQuantity
@@ -60,18 +60,37 @@ class VegetableStore{
 
 
     rottingVegetable (type, quantity) {
-        if(found.productQuantity < productQuantity){
-            return `The entire quantity of the ${productName} has been removed.`
+        let found = this.availableProducts.find((f)=> f.productName == type)
+
+        if(!found){
+            throw new Error(`${found.productName} is not available in the store.`)
         }
+
+        if(quantity > found.productQuantity){
+
+            found.productQuantity = 0
+
+            return `The entire quantity of the ${found.productName} has been removed.`
+        }
+        found.productQuantity -= quantity
+        return `Some quantity of the ${type} has been removed.`
     }
 
 
     revision () {
-
+        let array = []
+        let sorted = this.availableProducts.sort((a,b) => a.productPrice - b.productPrice)
+        array.push("Available vegetables:" )
+        for (const el of sorted) {
+            array.push(`${el.productName}-${el.productQuantity}-${"$"+el.productPrice}`)
+        }
+        array.push(`The owner of the store is ${this.owner}, and the location is ${this.location}.` )
+        return array.join('\n')
     }
 }
 let vegStore = new VegetableStore("Jerrie Munro", "1463 Pette Kyosheta, Sofia"); 
- console.log(vegStore.loadingVegetables(["Okra 2.5 3.5", "Beans 10 2.8", "Celery 5.5 2.2", "Celery 0.5 2.5"])); 
- console.log(vegStore.buyingVegetables(["Okra 1"])); 
- console.log(vegStore.buyingVegetables(["Beans 8", "Okra 1.5"])); 
- console.log(vegStore.buyingVegetables(["Banana 1", "Beans 2"]));  
+console.log(vegStore.loadingVegetables(["Okra 2.5 3.5", "Beans 10 2.8", "Celery 5.5 2.2", "Celery 0.5 2.5"])); 
+console.log(vegStore.rottingVegetable("Okra", 1)); 
+console.log(vegStore.rottingVegetable("Okra", 2.5)); 
+console.log(vegStore.buyingVegetables(["Beans 8", "Celery 1.5"])); 
+console.log(vegStore.revision()); 
